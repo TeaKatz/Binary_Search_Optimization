@@ -1,0 +1,1 @@
+from .MonsterHunter import MonsterHunter
