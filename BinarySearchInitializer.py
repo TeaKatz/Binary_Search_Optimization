@@ -1,31 +1,37 @@
 import os
 import joblib
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dense, LeakyReLU
 from tensorflow.keras.optimizers import Adam
 from sklearn.preprocessing import MinMaxScaler
+
+
+class SequenceDense(Model):
+	def __init__(self):
+		super().__init__()
+		self.dense_1 = Dense(64, activation=LeakyReLU())
+		self.dense_2 = Dense(1, activation="relu")
+
+	def call(self, inputs):
+		output = self.dense_1(inputs)
+		output = self.dense_2(output)
+
+		return output
 
 
 class BinarySearchInitializer:
 	def __init__(self, checkpoint_dir=None, scalers_dir=None):
 		self.checkpoint_dir = checkpoint_dir
 		self.scalers_dir = scalers_dir
-		self.model = None
+		self.model = SequenceDense()
 		self.scaler_x = MinMaxScaler()
 		self.scaler_y = MinMaxScaler()
-		
-		self.build_model()
+		self.error = 0.05 * 10000
+
 		if self.checkpoint_dir is not None:
 			self.load_weights()
 		if self.scalers_dir is not None:
 			self.load_scalers()
-		
-	def build_model(self):
-		self.model = Sequential()
-		self.model.add(Dense(16, activation="relu", input_shape=(1002, )))
-		self.model.add(Dense(1))
-		self.model.compile(optimizer=Adam(learning_rate=0.0001), loss="mae")
 		
 	def load_weights(self):
 		assert self.model is not None, "Must build model before call this function."
@@ -55,7 +61,7 @@ if __name__ == "__main__":
 	X = dataset.drop(columns=["monster_num", "attack_num"]).to_numpy().reshape([-1, 1002])
 	Y = dataset["attack_num"].to_numpy().reshape([-1, 1])
 	
-	initializer = BinarySearchInitializer(checkpoint_dir="./Checkpoints/SequenceDenseBalanced", scalers_dir="./Checkpoints")
+	initializer = BinarySearchInitializer(checkpoint_dir="./Save/SequenceDenseBalanced", scalers_dir="./Save")
 	predict = initializer.predict(X[1].reshape([1, 1002]))
 	print(predict)
 	print(Y[1])

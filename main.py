@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 from Environment import MonsterHunter
 from binarySearch import binarySearch
@@ -6,45 +7,50 @@ from preprocess import preprocess
 
 
 if __name__ == "__main__":
-	# Create environment
 	env = MonsterHunter()
 	env.reset()
-	# Get inputs and proprocess
+
+	attack_num = binarySearch(10000, 0, env.action)
+	print("actual attack_num: {}".format(attack_num))
+
 	inputs = pd.DataFrame(env.parameters)
 	inputs = preprocess(inputs)
-	# Create model and load parameters
-	initializer = BinarySearchInitializer()
-	# Tolerant of 2%
-	tolerant = env.max_hp + 0.02
-	# Find max_search and min_search
-	# Predict attack_num
-	attack_num = initializer.predict(inputs)
-	# Check result
-	if env.action(attack_num):
-		# All monsters die
-		max_search = attack_num
-		min_search = max_search - tolerant
-	else:
-		# Monsters survive
-		min_search = attack_num
-		max_search = min_search + tolerant
-	# Do binary search
-	attack_num = binarySearch(max_search, min_search, env.action)
-	if attack_num is None:
-		print("Time out!")
-		return
-	else:
-		# Check if answer correct
-		if env.action(attack_num - 1) == 0:
-			# Answer correct
-			print("Answer is: {}".format(attack_num))
-		else:
-			# Answer incorrect
+
+	initializer = BinarySearchInitializer(checkpoint_dir="./Save/SequenceDenseBalanced", scalers_dir="./Save")
+	attack_num = int(initializer.predict(inputs))
+	print("predicted attack_num: {}".format(attack_num))
+
+	step = initializer.error
+	print("Step: {}".format(step))
+	max_search = None
+	min_search = None
+	start_time = time.time()
+	while True:
+		if env.action(attack_num):
+			# All monsters die
 			max_search = attack_num
-			min_search = 1
+			attack_num -= step
+		else:
+			# Monsters survive
+			min_search = attack_num
+			attack_num += step
+		step *= 2
+		if time.time() - start_time > 30:
+			print("Time out!")
+			break
+		if max_search is not None and min_search is not None:
+			print("Start binary search")
+			print("Max search: {}".format(max_search))
+			print("Min search: {}".format(min_search))
 			attack_num = binarySearch(max_search, min_search, env.action)
-			if attack_num is None:
-				print("Time out!")
-				return
+			if attack_num is not None:
+				# Check answer
+				if env.action(attack_num - 1):
+					# Answer is incorrect
+					print("Answer is {} (incorrect)".format(attack_num))
+				else:
+					# Answer is incorrect
+					print("Answer is {} (correct)".format(attack_num))
 			else:
-				print("Answer is: {}".format(attack_num))
+				print("Time out!")
+			break

@@ -2,7 +2,7 @@ import numpy as np
 
 
 class MonsterHunter:
-    def __init__(self, min_monster_num=1, max_monster_num=1e3, min_focus_damage=2, max_focus_damage=1e3, min_aoe_damage=1, min_hp=1, max_hp=1e3):
+    def __init__(self, min_monster_num=1, max_monster_num=1e3, min_focus_damage=2, max_focus_damage=1e1, min_aoe_damage=1, min_hp=1, max_hp=1e4):
         self.min_monster_num = min_monster_num
         self.max_monster_num = max_monster_num
         self.min_focus_damage = min_focus_damage
@@ -17,11 +17,10 @@ class MonsterHunter:
         
     @property
     def parameters(self):
-        parameters = {}
-        parameters["monster_num"] = self.monster_num
-        parameters["focus_damage"] = self.focus_damage
-        parameters["aoe_damage"] = self.aoe_damage
-        parameters["monster_hps"] = self.monster_hps
+        parameters = {"monster_num": [self.monster_num],
+                      "focus_damage": [self.focus_damage],
+                      "aoe_damage": [self.aoe_damage],
+                      "monster_hps": [self.monster_hps]}
         
         return parameters
 
@@ -38,6 +37,9 @@ class MonsterHunter:
         Return: True if all monsters die.
                 False otherwise.
         """
+        if attack_num < 0:
+            attack_num = 0
+
         # Fetch monster hps
         t_monster_hps = self.monster_hps.copy()
 

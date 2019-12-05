@@ -27,6 +27,6 @@ def binarySearch(max_search, min_search, target, timeout=30):
 		# Update search value
 		val_search = int((max_search + min_search) // 2)
 		# Time out
-		if time.time() - start_time > 30:
+		if time.time() - start_time > timeout:
 			return None
 	return val_search
