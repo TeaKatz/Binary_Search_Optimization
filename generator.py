@@ -1,27 +1,22 @@
 import time
+import wandb
 import shutil
 import pandas as pd
-from os import makedirs, listdir
+import matplotlib.pyplot as plt
+from os import makedirs, listdir, remove
 from os.path import join, exists
 from Environment import MonsterHunter
 from binarySearch import binarySearch
+from visualizeDataset import visualizeDataset
 from utilities import getFileformat, getFilename, getFilepath, getUniquename
 
 
-def generate(env, save_dir, iter, verbose=0):
+def generate(env, iter, verbose=0, save_dir=None):
     dataset = {"monster_num": [],
                "focus_damage": [],
                "aoe_damage": [],
                "monster_hps": [],
                "attack_num": []}
-            
-    # Create directory if it does not exist
-    filepath = getFilepath(save_dir)
-    if not exists(filepath):
-        makedirs(filepath)
-        
-    # Create unique name for save file
-    save_dir = getUniquename(save_dir)
 
     # Init start time
     total_time = time.time()
@@ -45,35 +40,84 @@ def generate(env, save_dir, iter, verbose=0):
                     print("Epoch: {} Time: {:.2f}".format(epoch + 1, time.time() - epoch_time))
                     # Reset start time
                     epoch_time = time.time()
-                
-    # Save dataset
-    dataset = pd.DataFrame(dataset)
-    dataset.to_pickle(save_dir)
+
+    if save_dir is not None:
+        # Create directory if it does not exist
+        filepath = getFilepath(save_dir)
+        if not exists(filepath):
+            makedirs(filepath)
+
+        # Create unique name for save file
+        save_dir = getUniquename(save_dir)
+
+        # Save dataset
+        dataset = pd.DataFrame(dataset)
+        dataset.to_pickle(save_dir)
     
     print("Total time: {:.2f}".format(time.time() - total_time))
+    
+    return dataset
 
 
 if __name__ == "__main__":
-    # Get save directory
-    dataset_size = 10000
-    df_min = 10
-    df_max = 100
-    df_step = 10
-    hp_min = 1000
-    hp_max = 10000
-    hp_step = 100
-    
-    for hp in range(hp_min, hp_max + 1, hp_step):
-        for df in range(df_min, df_max + 1, df_step):
+    BASE_DIR = "./Datasets/verysmall"
+
+    data_size = 100
+    max_hps = list(range(100, 1001, 5))
+    max_monster_num = 1000
+    max_damage_list = list(range(5, 51))
+
+    for max_hp in max_hps:
+        folder = str(max_hp)
+        for max_damage in max_damage_list:
+            # Create environment
             env = MonsterHunter()
-            env.max_hp = hp
-            env.max_focus_damage = df
-            env.min_focus_damage = max(2, env.max_focus_damage - df_step)
-            
-            dataset_dir = "./Datasets/Dataset_medium_df{}-{}_hp{}-{}".format(df_min, df_max, hp_min, hp_max)
-            save_name = "dataset_{}_df{}_hp{}.pkl".format(dataset_size, df, hp)
-            save_dir = join(dataset_dir, save_name)
+            env.max_hp = max_hp
+            env.max_monster_num = max_monster_num
+            env.max_focus_damage = max_damage
+
+            # Generate
+            name = "dataset_{}_{}_{}_{}".format(max_hp, max_monster_num, max_damage, data_size)
+            save_dir = join(BASE_DIR, folder, name + ".pkl")
             if not exists(save_dir):
-                generate(env, save_dir, dataset_size, verbose=0)
+                print("Generating: {}...".format(save_dir))
+                dataset = generate(env, data_size, verbose=0, save_dir=save_dir)
+
+                # Visualize
+                plot_columns = ["monster_num", "focus_damage", "aoe_damage", "attack_num"]
+                visualizeDataset(save_dir, plot_columns, save_dir=join(BASE_DIR, folder, name + ".png"))
             else:
-                print("Skip {}".format(save_name))
+                print("Skip: {}".format(save_dir))
+
+        plot_columns = ["monster_num", "focus_damage", "aoe_damage", "attack_num"]
+        visualizeDataset(join(BASE_DIR, folder), plot_columns, save_dir=join(BASE_DIR, folder + ".png"))
+
+        # # Set configuration
+        # config = {"data_size": data_size,
+        #           "max_hp": max_hp,
+        #           "max_monster_num": max_monster_num,
+        #           "max_damage": max_damage}
+        #
+        # # Initial project
+        # name = "dataset_{}_{}_{}_{}".format(max_hp, max_monster_num, max_damage, data_size)
+        # wandb.init(project="binary_search_optimization", name=name, config=config, reinit=True)
+        #
+        # # Create environment
+        # env = MonsterHunter()
+        # env.max_hp = wandb.config.max_hp
+        # env.max_monster_num = wandb.config.max_monster_num
+        # env.max_focus_damage = wandb.config.max_damage
+        #
+        # # Generate
+        # save_dir = "./Datasets/{}.pkl".format(name)
+        # if exists(save_dir):
+        #     remove(save_dir)
+        #
+        # dataset = generate(env, wandb.config.data_size, verbose=0, save_dir=save_dir)
+        #
+        # plot_columns = ["monster_num", "focus_damage", "aoe_damage", "attack_num"]
+        # for i, col in enumerate(plot_columns):
+        #     plt.hist(dataset[col])
+        #     plt.title(col)
+        #     wandb.log({col: plt})
+        #     plt.clf()

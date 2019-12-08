@@ -5,7 +5,7 @@ from os.path import join, exists, isfile
 from utilities import getFilepath, getFilename, getFileformat
 
 
-def visualizeDataset(target_dir, plot_columns=None):
+def visualizeDataset(target_dir, plot_columns=None, save_dir=None):
 	if not isfile(target_dir):
 		# Input is folder path
 		folder_dir = target_dir
@@ -32,11 +32,13 @@ def visualizeDataset(target_dir, plot_columns=None):
 		axs[i].set_title(column_name)
 		axs[i].hist(dataset[column_name], bins=50)
 		
-	save_name = join(folder_dir, "datasetViz.png")
-	if exists(save_name):
-		# Delete old file
-		remove(save_name)
-	plt.savefig(join(folder_dir, "datasetViz.png"))
+	if save_dir is not None:
+		if exists(save_dir):
+			# Delete old file
+			remove(save_dir)
+		plt.savefig(save_dir)
+
+	plt.clf()
 	
 
 if __name__ == "__main__":

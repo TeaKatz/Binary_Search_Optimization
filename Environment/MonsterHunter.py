@@ -2,7 +2,7 @@ import numpy as np
 
 
 class MonsterHunter:
-    def __init__(self, min_monster_num=1, max_monster_num=1e3, min_focus_damage=2, max_focus_damage=1e1, min_aoe_damage=1, min_hp=1, max_hp=1e4):
+    def __init__(self, min_monster_num=1, max_monster_num=1e3, min_focus_damage=2, max_focus_damage=1e1, min_aoe_damage=1, min_hp=1, max_hp=1e3):
         self.min_monster_num = min_monster_num
         self.max_monster_num = max_monster_num
         self.min_focus_damage = min_focus_damage
