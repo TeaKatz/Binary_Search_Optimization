@@ -1,9 +1,8 @@
 import time
 import pandas as pd
-from Environment import MonsterHunter
-from binarySearch import binarySearch
+from Environment.MonsterHunter import MonsterHunter, preprocess
+from utilities import binarySearch
 from BinarySearchInitializer import BinarySearchInitializer
-from preprocess import preprocess
 
 
 if __name__ == "__main__":

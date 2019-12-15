@@ -2,7 +2,6 @@ import os
 import joblib
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, LeakyReLU
-from tensorflow.keras.optimizers import Adam
 from sklearn.preprocessing import MinMaxScaler
 
 

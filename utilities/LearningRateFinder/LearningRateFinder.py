@@ -58,7 +58,7 @@ class LearningRateFinder:
 		correctedloss = self.smooth_loss / (1 - (self.beta ** self.batch_num))
 		self.losses.append(correctedloss)
 		
-		# Calcualte stop loss
+		# Calculate stop loss
 		stoploss = self.stopFactor * self.best_loss
 		
 		if self.batch_num > 1 and self.smooth_loss > stoploss:
@@ -70,7 +70,7 @@ class LearningRateFinder:
 			# Update best loss
 			self.best_loss = correctedloss
 		
-		# Increate learning rate
+		# Increase learning rate
 		lr *= self.lrMult
 		K.set_value(self.model.optimizer.lr, lr)
 		
@@ -98,10 +98,10 @@ class LearningRateFinder:
 		# Run training
 		K.set_value(self.model.optimizer.lr, start_lr)
 		self.model.fit(training_data[0], training_data[1],
-						batch_size=batch_size,
-						epochs=epochs,
-						verbose=verbose,
-						callbacks=[callback])
+					   batch_size=batch_size,
+					   epochs=epochs,
+					   verbose=verbose,
+					   callbacks=[callback])
 		
 		# Load model weights back
 		self.model.load_weights(weightsFile)
@@ -109,4 +109,4 @@ class LearningRateFinder:
 		
 
 if __name__ == "__main__":
-	lr_finder = LearningRateFider(None)
+	lr_finder = LearningRateFinder(None)
