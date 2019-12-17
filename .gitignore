@@ -6,3 +6,5 @@ utilities/sampling/.DS_Store
 utilities/.DS_Store
 /Datasets/
 /wandb/
+/.ipynb_checkpoints/
+/.idea/

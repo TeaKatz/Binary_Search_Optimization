@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from os import listdir, remove
+from os import listdir, remove, walk
 from os.path import join, exists, isfile
 from utilities import getFilepath, getFilename, getFileformat
 
@@ -10,7 +10,7 @@ def visualizeDataset(target_dir, plot_columns=None, save_dir=None):
 		# Input is folder path
 		folder_dir = target_dir
 		# Get all file names in the folder
-		filenames = [f for f in listdir(folder_dir) if f.split(".")[-1] == "pkl"]
+		filenames = [file for (dirpath, dirnames, filenames) in walk(folder_dir) for file in filenames if file.split(".")[-1] == "pkl"]
 	else:
 		# Input is file path
 		folder_dir = getFilepath(target_dir)
@@ -38,10 +38,11 @@ def visualizeDataset(target_dir, plot_columns=None, save_dir=None):
 			remove(save_dir)
 		plt.savefig(save_dir)
 
-	plt.clf()
+	plt.close(fig)
 	
 
 if __name__ == "__main__":
-	target_dir = "./Datasets/dataset_small_balanced.pkl"
-	plot_columns = ["monster_num", "focus_damage", "aoe_damage", "attack_num"]
-	visualizeDataset(target_dir, plot_columns)
+	target_dir = "./dataset_verysmall_hp100000_balanced.pkl"
+	save_dir = "./dataset_verysmall_hp100000_balanced.png"
+	plot_columns = ["focus_damage", "aoe_damage", "attack_num"]
+	visualizeDataset(target_dir, plot_columns, save_dir)

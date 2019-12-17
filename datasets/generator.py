@@ -1,14 +1,10 @@
 import time
-import wandb
-import shutil
 import pandas as pd
-import matplotlib.pyplot as plt
-from os import makedirs, listdir, remove
+from os import makedirs
 from os.path import join, exists
-from Environment import MonsterHunter
-from binarySearch import binarySearch
-from visualizeDataset import visualizeDataset
-from utilities import getFileformat, getFilename, getFilepath, getUniquename
+from environments.monster_hunter import MonsterHunter
+from datasets.visualizeDataset import visualizeDataset
+from utilities import getFilepath, getUniquename, binarySearch
 
 
 def generate(env, iter, verbose=0, save_dir=None):
@@ -60,12 +56,12 @@ def generate(env, iter, verbose=0, save_dir=None):
 
 
 if __name__ == "__main__":
-    BASE_DIR = "./Datasets/verysmall"
+    BASE_DIR = "./verysmall_hp100000_num10000"
 
     data_size = 100
-    max_hps = list(range(100, 1001, 5))
-    max_monster_num = 1000
-    max_damage_list = list(range(5, 51))
+    max_hps = list(range(100, 100001, 500))
+    max_monster_num = 10000
+    max_damage_list = list(range(5, 101, 2))
 
     for max_hp in max_hps:
         folder = str(max_hp)
@@ -91,33 +87,3 @@ if __name__ == "__main__":
 
         plot_columns = ["monster_num", "focus_damage", "aoe_damage", "attack_num"]
         visualizeDataset(join(BASE_DIR, folder), plot_columns, save_dir=join(BASE_DIR, folder + ".png"))
-
-        # # Set configuration
-        # config = {"data_size": data_size,
-        #           "max_hp": max_hp,
-        #           "max_monster_num": max_monster_num,
-        #           "max_damage": max_damage}
-        #
-        # # Initial project
-        # name = "dataset_{}_{}_{}_{}".format(max_hp, max_monster_num, max_damage, data_size)
-        # wandb.init(project="binary_search_optimization", name=name, config=config, reinit=True)
-        #
-        # # Create environment
-        # env = MonsterHunter()
-        # env.max_hp = wandb.config.max_hp
-        # env.max_monster_num = wandb.config.max_monster_num
-        # env.max_focus_damage = wandb.config.max_damage
-        #
-        # # Generate
-        # save_dir = "./Datasets/{}.pkl".format(name)
-        # if exists(save_dir):
-        #     remove(save_dir)
-        #
-        # dataset = generate(env, wandb.config.data_size, verbose=0, save_dir=save_dir)
-        #
-        # plot_columns = ["monster_num", "focus_damage", "aoe_damage", "attack_num"]
-        # for i, col in enumerate(plot_columns):
-        #     plt.hist(dataset[col])
-        #     plt.title(col)
-        #     wandb.log({col: plt})
-        #     plt.clf()

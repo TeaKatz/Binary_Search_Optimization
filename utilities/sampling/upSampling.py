@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 
-def upSampling(data, column, bins=100, mode="mean"):
+def upSampling(data, column, bins=100, target_samples="mean"):
 	"""
 	This function will down-up sampling data to mean samples of column's data.
 	data: pandas DataFrame
@@ -25,17 +25,18 @@ def upSampling(data, column, bins=100, mode="mean"):
 		sample_nums[bin_index] = queries[bin_index].shape[0]
 		
 	# Get target samples
-	mode = mode.lower()
-	if mode == "mean":
-		target_samples = statistics.mean(sample_nums.values())
-	elif mode == "max":
-		target_samples = max(sample_nums.values())
-	elif mode == "min":
-		target_samples = min(sample_nums.values())
-	elif mode == "median":
-		target_samples = statistics.median(sample_nums.values())
-	else:
-		target_samples = statistics.mean(sample_nums.values())
+	if isinstance(target_samples, str):
+		target_samples = target_samples.lower()
+		if target_samples == "mean":
+			target_samples = statistics.mean(sample_nums.values())
+		elif target_samples == "max":
+			target_samples = max(sample_nums.values())
+		elif target_samples == "min":
+			target_samples = min(sample_nums.values())
+		elif target_samples == "median":
+			target_samples = statistics.median(sample_nums.values())
+		else:
+			target_samples = statistics.mean(sample_nums.values())
 	target_samples = int(target_samples)
 		
 	# Get samplings size
@@ -74,8 +75,8 @@ def upSampling(data, column, bins=100, mode="mean"):
 if __name__ == "__main__":
 	import matplotlib.pyplot as plt
 	
-	data = pd.read_pickle("../../Datasets/dataset_verysmall.pkl")
-	samplings = upSampling(data, "attack_num", mode="mean")
+	data = pd.read_pickle("../../datasets/dataset_verysmall.pkl")
+	samplings = upSampling(data, "attack_num", target_samples="mean")
 	plt.subplot(2, 1, 1)
 	plt.hist(data["attack_num"], bins=100)
 	plt.subplot(2, 1, 2)

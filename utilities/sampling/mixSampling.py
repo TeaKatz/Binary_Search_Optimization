@@ -1,11 +1,9 @@
 import statistics
 import numpy as np
 import pandas as pd
-from downSampling import downSampling
-from upSampling import upSampling
 
 
-def mixSampling(data, column, bins=100, mode="mean"):
+def mixSampling(data, column, bins=100, target_samples="mean"):
 	"""
 	This function will down-up sampling data to mean samples of column's data.
 	data: pandas DataFrame
@@ -27,16 +25,17 @@ def mixSampling(data, column, bins=100, mode="mean"):
 		sample_nums[bin_index] = queries[bin_index].shape[0]
 		
 	# Get target samples
-	if mode == "mean":
-		target_samples = statistics.mean(sample_nums.values())
-	elif mode == "max":
-		target_samples = max(sample_nums.values())
-	elif mode == "min":
-		target_samples = min(sample_nums.values())
-	elif mode == "median":
-		target_samples = statistics.median(sample_nums.values())
-	else:
-		target_samples = statistics.mean(sample_nums.values())
+	if isinstance(target_samples, str):
+		if target_samples == "mean":
+			target_samples = statistics.mean(sample_nums.values())
+		elif target_samples == "max":
+			target_samples = max(sample_nums.values())
+		elif target_samples == "min":
+			target_samples = min(sample_nums.values())
+		elif target_samples == "median":
+			target_samples = statistics.median(sample_nums.values())
+		else:
+			target_samples = statistics.mean(sample_nums.values())
 	target_samples = int(target_samples)
 	
 	# Get samplings size
@@ -72,9 +71,9 @@ def mixSampling(data, column, bins=100, mode="mean"):
 if __name__ == "__main__":
 	import matplotlib.pyplot as plt
 	
-	data = pd.read_pickle("../../Datasets/dataset_small.pkl")
-	samplings = mixSampling(data, "attack_num", mode="mean")
-	samplings.to_pickle("../../Datasets/dataset_small_balanced.pkl")
+	data = pd.read_pickle("../../datasets/dataset_verysmall_hp100000.pkl")
+	samplings = mixSampling(data, "attack_num", target_samples=900)
+	samplings.to_pickle("../../datasets/dataset_verysmall_hp100000_balanced_4.pkl")
 	plt.subplot(2, 1, 1)
 	plt.hist(data["attack_num"], bins=100)
 	plt.subplot(2, 1, 2)
