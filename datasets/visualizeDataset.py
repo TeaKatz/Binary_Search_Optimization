@@ -42,7 +42,7 @@ def visualizeDataset(target_dir, plot_columns=None, save_dir=None):
 	
 
 if __name__ == "__main__":
-	target_dir = "./dataset_verysmall_hp100000_balanced.pkl"
-	save_dir = "./dataset_verysmall_hp100000_balanced.png"
+	target_dir = "./dataset_verysmall_hp10000_num10000_max_balanced.pkl"
+	save_dir = "./dataset_verysmall_hp10000_num10000_max_balanced.png"
 	plot_columns = ["focus_damage", "aoe_damage", "attack_num"]
 	visualizeDataset(target_dir, plot_columns, save_dir)

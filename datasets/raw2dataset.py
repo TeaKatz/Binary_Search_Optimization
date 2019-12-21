@@ -39,7 +39,7 @@ def raw2dataset(folder_dir, max_monsters_num=1000, save_dir=None, file_format="p
 
 	# Pre-processing
 	print("Preprocessing...")
-	dataset = preprocess(dataset, max_monsters_num=max_monsters_num)
+	dataset = preprocess(dataset, max_monsters_num=max_monsters_num, truncate_mode="cut")
 
 	# Save
 	print("Saving to {}...".format(save_dir))
@@ -50,4 +50,4 @@ def raw2dataset(folder_dir, max_monsters_num=1000, save_dir=None, file_format="p
 	print("Done")
 
 if __name__ == "__main__":
-	raw2dataset("./verysmall_hp100000", save_dir="./dataset_verysmall_hp100000.pkl")
+	raw2dataset("./verysmall_hp100000_num10000", save_dir="./dataset_verysmall_hp100000_num10000.pkl")

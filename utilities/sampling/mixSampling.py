@@ -71,11 +71,6 @@ def mixSampling(data, column, bins=100, target_samples="mean"):
 if __name__ == "__main__":
 	import matplotlib.pyplot as plt
 	
-	data = pd.read_pickle("../../datasets/dataset_verysmall_hp100000.pkl")
+	data = pd.read_pickle("../../datasets/dataset_verysmall_hp10000_num10000_max.pkl")
 	samplings = mixSampling(data, "attack_num", target_samples=900)
-	samplings.to_pickle("../../datasets/dataset_verysmall_hp100000_balanced_4.pkl")
-	plt.subplot(2, 1, 1)
-	plt.hist(data["attack_num"], bins=100)
-	plt.subplot(2, 1, 2)
-	plt.hist(samplings["attack_num"], bins=100)
-	plt.show()
+	samplings.to_pickle("../../datasets/dataset_verysmall_hp10000_num10000_max_balanced.pkl")
